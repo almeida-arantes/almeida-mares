@@ -1,0 +1,5 @@
+{
+  "name": "almeida-mares",
+  "private": true,
+  "description": "A app Next.js está em /web. Na Vercel, defina Root Directory como \"web\" (recomendado) ou use o vercel.json na raiz."
+}
