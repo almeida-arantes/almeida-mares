@@ -19,6 +19,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { ScrollToTop } from "@/components/marketing/scroll-to-top";
+import { isAuthDevBypass } from "@/lib/dev-auth-bypass";
 
 const features = [
   {
@@ -68,6 +69,9 @@ const integrations = [
   { name: "Open Finance", note: "Pluggy / Belvo" },
 ];
 
+/** Garante que URLs do header/hero honoram env no deploy (evita página estática “congelada”). */
+export const dynamic = "force-dynamic";
+
 const steps = [
   {
     n: "01",
@@ -90,6 +94,12 @@ const steps = [
 ];
 
 export default function LandingPage() {
+  const bypass = isAuthDevBypass();
+  const dashboardHref = bypass ? "/app/inicio" : "/login?next=/app/inicio";
+  const portalHref = bypass
+    ? "/portal/painel"
+    : "/login?context=portal&next=/portal/painel";
+
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       {/* Background decorations */}
@@ -148,6 +158,14 @@ export default function LandingPage() {
           </details>
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            {bypass ? (
+              <Link
+                href="/app/inicio"
+                className="inline-flex shrink-0 text-xs font-medium text-primary underline-offset-4 hover:underline sm:text-sm"
+              >
+                Painel dev
+              </Link>
+            ) : null}
             <Button
               variant="ghost"
               size="sm"
@@ -156,7 +174,7 @@ export default function LandingPage() {
             >
               Entrar
             </Button>
-            <Button size="sm" render={<Link href="/login?next=/app/inicio" />}>
+            <Button size="sm" render={<Link href={dashboardHref} />}>
               Área operacional
               <ArrowRight className="ml-1.5 h-4 w-4" />
             </Button>
@@ -201,15 +219,11 @@ export default function LandingPage() {
             de um software de ponta — pelo custo de uma gestora independente.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button size="lg" className="gap-2" render={<Link href="/login?next=/app/inicio" />}>
+            <Button size="lg" className="gap-2" render={<Link href={dashboardHref} />}>
               Abrir dashboard
               <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              render={<Link href="/login?context=portal&next=/portal/painel" />}
-            >
+            <Button size="lg" variant="outline" render={<Link href={portalHref} />}>
               Ver portal do proprietário
             </Button>
           </div>
@@ -506,7 +520,7 @@ export default function LandingPage() {
             Agende uma conversa com a equipe Almeida Mares para ativar sua conta.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button size="lg" className="gap-2" render={<Link href="/login?next=/app/inicio" />}>
+            <Button size="lg" className="gap-2" render={<Link href={dashboardHref} />}>
               Abrir dashboard agora
               <ArrowRight className="h-4 w-4" />
             </Button>

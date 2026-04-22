@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { isAuthDevBypass } from "@/lib/dev-auth-bypass";
 
 const navLinks = [
   { href: "/servicos", label: "Serviços" },
@@ -22,6 +23,8 @@ export function MarketingShell({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const bypass = isAuthDevBypass();
+  const dashboardHref = bypass ? "/app/inicio" : "/login?next=/app/inicio";
 
   return (
     <div className="relative min-h-screen">
@@ -47,6 +50,14 @@ export function MarketingShell({
           </nav>
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            {bypass ? (
+              <Link
+                href="/app/inicio"
+                className="hidden text-xs font-medium text-primary underline-offset-4 hover:underline sm:inline-flex sm:text-sm"
+              >
+                Painel dev
+              </Link>
+            ) : null}
             <Button
               type="button"
               variant="outline"
@@ -74,6 +85,15 @@ export function MarketingShell({
                     </Link>
                   ))}
                   <hr className="my-2 border-border" />
+                  {bypass ? (
+                    <Link
+                      href="/app/inicio"
+                      className="rounded-md px-3 py-2.5 text-sm font-medium text-primary hover:bg-muted"
+                      onClick={() => setOpen(false)}
+                    >
+                      Painel dev
+                    </Link>
+                  ) : null}
                   <Link
                     href="/login"
                     className="rounded-md px-3 py-2.5 text-sm hover:bg-muted"
@@ -82,7 +102,7 @@ export function MarketingShell({
                     Entrar
                   </Link>
                   <Link
-                    href="/login?next=/app/inicio"
+                    href={dashboardHref}
                     className="rounded-md px-3 py-2.5 text-sm font-medium text-primary hover:bg-muted"
                     onClick={() => setOpen(false)}
                   >
@@ -94,7 +114,7 @@ export function MarketingShell({
             <Button variant="ghost" size="sm" className="hidden sm:inline-flex" render={<Link href="/login" />}>
               Entrar
             </Button>
-            <Button size="sm" className="hidden sm:inline-flex gap-1" render={<Link href="/login?next=/app/inicio" />}>
+            <Button size="sm" className="hidden sm:inline-flex gap-1" render={<Link href={dashboardHref} />}>
               Área operacional
               <ArrowRight className="h-4 w-4" />
             </Button>
