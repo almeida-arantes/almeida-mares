@@ -45,18 +45,14 @@ export default function LoginPage() {
           <Card>
             <CardContent className="p-6">
               <Suspense fallback={null}>
-                <LoginForm />
+                <LoginForm devShortcutEnabled={devBypass} />
               </Suspense>
             </CardContent>
           </Card>
 
           {devBypass ? (
-            <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-950 dark:text-amber-100">
-              <strong className="font-medium">Modo desenvolvedor:</strong> com{" "}
-              <code className="rounded bg-background/80 px-1 py-px font-mono">
-                NEXT_PUBLIC_AUTH_DEV_BYPASS=true
-              </code>{" "}
-              no <code className="font-mono">.env.local</code> você acessa o painel direto:{" "}
+            <p className="text-center text-xs text-muted-foreground">
+              Atalhos diretos:{" "}
               <Link href="/app/inicio" className="underline font-medium">
                 /app/inicio
               </Link>
@@ -64,9 +60,7 @@ export default function LoginPage() {
               <Link href="/portal/painel" className="underline font-medium">
                 /portal/painel
               </Link>
-              {" "}
-              (sem cadastro e sem formulário).
-            </div>
+            </p>
           ) : null}
 
           <p className="text-center text-xs text-muted-foreground">

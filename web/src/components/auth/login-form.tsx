@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
-import { Loader2, Mail } from "lucide-react";
+import { FlaskConical, Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Role = "staff" | "owner";
 
-export function LoginForm() {
+type LoginFormProps = {
+  /** Mostra atalho de login sem credenciais (só quando isAuthDevBypass no servidor). */
+  devShortcutEnabled?: boolean;
+};
+
+export function LoginForm({ devShortcutEnabled = false }: LoginFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextRaw = searchParams.get("next");
@@ -46,6 +51,35 @@ export function LoginForm() {
         nextRaw && (nextRaw.startsWith("/app") || nextRaw.startsWith("/portal"))
           ? nextRaw
           : role === "owner"
+            ? "/portal/painel"
+            : "/app/inicio";
+      router.push(next);
+      router.refresh();
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function devQuickLogin(target: "staff" | "owner") {
+    setPending(true);
+    try {
+      const res = await signIn("credentials", {
+        email:
+          target === "staff"
+            ? "dev@almeidamares.com.br"
+            : "ricardo.m@gmail.com",
+        code: "dev",
+        role: target,
+        redirect: false,
+      });
+      if (res?.error) {
+        toast.error("Atalho de desenvolvimento indisponível (verifique o modo dev).");
+        return;
+      }
+      const next =
+        nextRaw && (nextRaw.startsWith("/app") || nextRaw.startsWith("/portal"))
+          ? nextRaw
+          : target === "owner"
             ? "/portal/painel"
             : "/app/inicio";
       router.push(next);
@@ -119,6 +153,36 @@ export function LoginForm() {
         )}
         Entrar
       </Button>
+
+      {devShortcutEnabled ? (
+        <div className="space-y-2 rounded-lg border border-dashed border-amber-500/50 bg-amber-500/5 p-3">
+          <p className="text-xs font-medium text-amber-950 dark:text-amber-100">
+            Desenvolvimento — sem credenciais
+          </p>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1 gap-2 border-amber-500/40"
+              disabled={pending}
+              onClick={() => void devQuickLogin("staff")}
+            >
+              <FlaskConical className="h-4 w-4 shrink-0" />
+              Painel equipe
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1 gap-2 border-amber-500/40"
+              disabled={pending}
+              onClick={() => void devQuickLogin("owner")}
+            >
+              <FlaskConical className="h-4 w-4 shrink-0" />
+              Portal proprietário
+            </Button>
+          </div>
+        </div>
+      ) : null}
     </form>
   );
 }
