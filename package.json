@@ -1,5 +1,0 @@
-{
-  "name": "almeida-mares",
-  "private": true,
-  "description": "Next.js em /web. Vercel: Settings → General → Root Directory = web → Save → Redeploy. O vercel.json na raiz ajuda se o Root Directory ficar na raiz do Git."
-}
