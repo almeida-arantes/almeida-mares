@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,8 +62,10 @@ export default function PerfilPage() {
       <Separator />
 
       <div className="flex justify-end gap-2">
-        <Button variant="outline">Cancelar</Button>
-        <Button>Salvar alterações</Button>
+        <Button variant="outline" render={<Link href="/portal/painel" />}>
+          Cancelar
+        </Button>
+        <Button render={<Link href="/portal/painel" />}>Salvar alterações</Button>
       </div>
     </div>
   );

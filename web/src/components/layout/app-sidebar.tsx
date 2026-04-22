@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3,
-  BookOpen,
+  BedDouble,
   Building2,
   CalendarDays,
   ClipboardList,
@@ -16,6 +16,7 @@ import {
   Settings,
   Users,
   Wrench,
+  Bell,
 } from "lucide-react";
 
 import {
@@ -34,11 +35,12 @@ import {
 import { Logo } from "@/components/brand/logo";
 import { Badge } from "@/components/ui/badge";
 
-const primary = [
+const principal = [
   { title: "Início", href: "/app/inicio", icon: Home },
   { title: "Calendário", href: "/app/calendario", icon: CalendarDays },
-  { title: "Reservas", href: "/app/reservas", icon: BookOpen },
+  { title: "Reservas", href: "/app/reservas", icon: BedDouble },
   { title: "Mensagens", href: "/app/mensagens", icon: Inbox, badge: "3" },
+  { title: "Notificações", href: "/app/notificacoes", icon: Bell },
 ];
 
 const cadastros = [
@@ -51,7 +53,7 @@ const finance = [
   { title: "Relatórios", href: "/app/relatorios", icon: FileText },
 ];
 
-const ops = [
+const sistema = [
   { title: "Operação", href: "/app/operacao", icon: Wrench },
   { title: "Integrações", href: "/app/integracoes", icon: Plug },
   { title: "Auditoria", href: "/app/auditoria", icon: ClipboardList },
@@ -70,26 +72,30 @@ export function AppSidebar() {
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                isActive={isActive(item.href)}
-                tooltip={item.title}
-                render={<Link href={item.href as never} />}
-              >
-                <item.icon className="h-4 w-4" />
-                <span>{item.title}</span>
-                {item.badge && (
-                  <Badge
-                    variant="secondary"
-                    className="ml-auto h-5 px-1.5 text-[10px]"
-                  >
-                    {item.badge}
-                  </Badge>
-                )}
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {items.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  isActive={active}
+                  tooltip={item.title}
+                  aria-current={active ? "page" : undefined}
+                  render={<Link href={item.href as never} />}
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.title}</span>
+                  {item.badge && (
+                    <Badge
+                      variant="secondary"
+                      className="ml-auto h-5 px-1.5 text-[10px]"
+                    >
+                      {item.badge}
+                    </Badge>
+                  )}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
@@ -104,26 +110,30 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {renderGroup("Operação", primary)}
+        {renderGroup("Principal", principal)}
         {renderGroup("Cadastros", cadastros)}
         {renderGroup("Financeiro", finance)}
-        {renderGroup("Sistema", ops)}
+        {renderGroup("Sistema", sistema)}
       </SidebarContent>
 
       <SidebarFooter className="border-t">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip="Desempenho"
+              tooltip="Visão geral"
+              aria-current={isActive("/app/inicio") ? "page" : undefined}
+              isActive={pathname === "/app/inicio"}
               render={<Link href="/app/inicio" />}
             >
               <BarChart3 className="h-4 w-4" />
-              <span>Desempenho</span>
+              <span>Visão geral</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Configurações"
+              aria-current={isActive("/app/configuracoes") ? "page" : undefined}
+              isActive={isActive("/app/configuracoes")}
               render={<Link href="/app/configuracoes" />}
             >
               <Settings className="h-4 w-4" />

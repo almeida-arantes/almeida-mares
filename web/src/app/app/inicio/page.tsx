@@ -36,10 +36,13 @@ import { Separator } from "@/components/ui/separator";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { OccupancyChart } from "@/components/dashboard/occupancy-chart";
+import { PageHeader } from "@/components/app/page-header";
+import { auth } from "@/auth";
 import {
   alerts,
   channels,
   kpis,
+  owners,
   properties,
   reservations,
 } from "@/lib/mock-data";
@@ -50,7 +53,17 @@ function getPropName(id: string) {
   return properties.find((p) => p.id === id)?.nickname ?? "—";
 }
 
-export default function InicioPage() {
+function timeGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return "Bom dia";
+  if (h < 18) return "Boa tarde";
+  return "Boa noite";
+}
+
+export default async function InicioPage() {
+  const session = await auth();
+  const firstName = session?.user?.name?.split(/\s+/)[0] ?? "Ingrid";
+
   const todayISO = new Date().toISOString().split("T")[0];
 
   const todaysCheckIns = reservations
@@ -75,45 +88,42 @@ export default function InicioPage() {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="font-display text-2xl font-semibold tracking-tight">
-              Boa tarde, Ingrid.
-            </h1>
-            <Badge variant="secondary" className="gap-1">
+      <PageHeader
+        title={
+          <span className="flex flex-wrap items-center gap-2">
+            {timeGreeting()}, {firstName}.
+            <Badge variant="secondary" className="gap-1 font-normal">
               <Sparkles className="h-3 w-3" />
               Abril / 2026
             </Badge>
-          </div>
-          <p className="mt-1 text-sm text-muted-foreground">
+          </span>
+        }
+        description={
+          <>
             Visão consolidada de{" "}
-            <span className="font-medium text-foreground">{properties.length}</span>{" "}
-            propriedades,{" "}
-            <span className="font-medium text-foreground">5</span>{" "}
-            proprietários e{" "}
+            <span className="font-medium text-foreground">{properties.length}</span> propriedades,{" "}
+            <span className="font-medium text-foreground">{owners.length}</span> proprietários e{" "}
             <span className="font-medium text-foreground">
               {reservations.filter((r) => r.status !== "cancelada").length}
             </span>{" "}
             reservas ativas.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <CalendarCheck2 className="h-4 w-4" />
-            Últimos 30 dias
-          </Button>
-          <Button
-            size="sm"
-            className="gap-1.5"
-            render={<Link href="/app/reservas" />}
-          >
-            Nova reserva
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+          </>
+        }
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5"
+          render={<Link href="/app/financeiro/fluxo-caixa" />}
+        >
+          <CalendarCheck2 className="h-4 w-4" />
+          Últimos 30 dias
+        </Button>
+        <Button size="sm" className="gap-1.5" render={<Link href="/app/reservas/nova" />}>
+          Nova reserva
+          <ArrowRight className="h-4 w-4" />
+        </Button>
+      </PageHeader>
 
       {/* KPIs grid */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -151,13 +161,37 @@ export default function InicioPage() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <KpiCard label="ADR" value={brl(kpis.adr)} delta={kpis.adrDelta} hint="diária média" />
-        <KpiCard label="RevPAR" value={brl(kpis.revpar)} delta={kpis.revparDelta} hint="por noite disponível" />
-        <KpiCard label="Estadia média" value={`${kpis.avgStay.toString().replace(".", ",")} noites`} delta={kpis.avgStayDelta} hint="LOS" />
-        <KpiCard label="Pickup 7d" value={`+${kpis.pickup7d}`} delta={kpis.pickup7dDelta} deltaSuffix="" hint="novas reservas" />
-        <KpiCard label="Direto" value={`${kpis.directShare}%`} delta={kpis.directShareDelta} hint="share do canal" />
-      </div>
+      <details className="group rounded-xl border border-border/80 bg-card/30 open:bg-card/50">
+        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-foreground marker:content-none [&::-webkit-details-marker]:hidden">
+          <span className="flex items-center justify-between gap-2">
+            Mais indicadores (ADR, RevPAR, estadia…)
+            <span className="text-xs font-normal text-muted-foreground group-open:hidden">
+              Expandir
+            </span>
+            <span className="hidden text-xs font-normal text-muted-foreground group-open:inline">
+              Recolher
+            </span>
+          </span>
+        </summary>
+        <div className="grid grid-cols-2 gap-4 border-t border-border/60 p-4 pt-4 lg:grid-cols-5">
+          <KpiCard label="ADR" value={brl(kpis.adr)} delta={kpis.adrDelta} hint="diária média" />
+          <KpiCard label="RevPAR" value={brl(kpis.revpar)} delta={kpis.revparDelta} hint="por noite disponível" />
+          <KpiCard
+            label="Estadia média"
+            value={`${kpis.avgStay.toString().replace(".", ",")} noites`}
+            delta={kpis.avgStayDelta}
+            hint="LOS"
+          />
+          <KpiCard
+            label="Pickup 7d"
+            value={`+${kpis.pickup7d}`}
+            delta={kpis.pickup7dDelta}
+            deltaSuffix=""
+            hint="novas reservas"
+          />
+          <KpiCard label="Direto" value={`${kpis.directShare}%`} delta={kpis.directShareDelta} hint="share do canal" />
+        </div>
+      </details>
 
       {/* Main grid */}
       <div className="grid gap-6 lg:grid-cols-3">
@@ -247,9 +281,10 @@ export default function InicioPage() {
                   <div className="text-xs text-muted-foreground">Sem chegadas.</div>
                 )}
                 {todaysCheckIns.map((r) => (
-                  <div
+                  <Link
                     key={r.id}
-                    className="flex items-center gap-3 rounded-md border border-border/60 p-2.5"
+                    href={`/app/reservas/${r.id}`}
+                    className="flex items-center gap-3 rounded-md border border-border/60 p-2.5 transition hover:bg-muted/50"
                   >
                     <Avatar className="size-8">
                       <AvatarFallback className="bg-primary/10 text-primary text-xs">
@@ -278,7 +313,7 @@ export default function InicioPage() {
                       <div className="text-xs font-medium">{dateShort(r.checkIn)}</div>
                       <div className="text-[10px] text-muted-foreground">15h00</div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -292,9 +327,10 @@ export default function InicioPage() {
                   <div className="text-xs text-muted-foreground">Sem saídas.</div>
                 )}
                 {todaysCheckOuts.map((r) => (
-                  <div
+                  <Link
                     key={r.id}
-                    className="flex items-center gap-3 rounded-md border border-border/60 p-2.5"
+                    href={`/app/reservas/${r.id}`}
+                    className="flex items-center gap-3 rounded-md border border-border/60 p-2.5 transition hover:bg-muted/50"
                   >
                     <Avatar className="size-8">
                       <AvatarFallback className="bg-chart-2/15 text-chart-2 text-xs">
@@ -311,7 +347,7 @@ export default function InicioPage() {
                       <div className="text-xs font-medium">{dateShort(r.checkOut)}</div>
                       <div className="text-[10px] text-muted-foreground">11h00</div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -355,48 +391,54 @@ export default function InicioPage() {
 
       {/* Quick links */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="group cursor-pointer transition hover:border-primary/40">
-          <CardContent className="flex items-center gap-4 p-5">
-            <div className="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <KeyRound className="h-5 w-5" />
-            </div>
-            <div className="flex-1">
-              <div className="font-medium">Fechamento mensal</div>
-              <div className="text-xs text-muted-foreground">
-                5 extratos pendentes de aprovação
+        <Link href="/app/financeiro" className="block">
+          <Card className="group h-full transition hover:border-primary/40">
+            <CardContent className="flex items-center gap-4 p-5">
+              <div className="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <KeyRound className="h-5 w-5" />
               </div>
-            </div>
-            <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
-          </CardContent>
-        </Card>
-        <Card className="group cursor-pointer transition hover:border-primary/40">
-          <CardContent className="flex items-center gap-4 p-5">
-            <div className="flex size-11 items-center justify-center rounded-lg bg-chart-2/15 text-chart-2">
-              <MessageSquare className="h-5 w-5" />
-            </div>
-            <div className="flex-1">
-              <div className="font-medium">Caixa de mensagens</div>
-              <div className="text-xs text-muted-foreground">
-                3 conversas aguardando resposta
+              <div className="flex-1">
+                <div className="font-medium">Fechamento mensal</div>
+                <div className="text-xs text-muted-foreground">
+                  5 extratos pendentes de aprovação
+                </div>
               </div>
-            </div>
-            <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
-          </CardContent>
-        </Card>
-        <Card className="group cursor-pointer transition hover:border-primary/40">
-          <CardContent className="flex items-center gap-4 p-5">
-            <div className="flex size-11 items-center justify-center rounded-lg bg-chart-3/15 text-chart-3">
-              <Home className="h-5 w-5" />
-            </div>
-            <div className="flex-1">
-              <div className="font-medium">Turnover pendente</div>
-              <div className="text-xs text-muted-foreground">
-                2 limpezas a agendar nas próximas 24h
+              <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/app/mensagens" className="block">
+          <Card className="group h-full transition hover:border-primary/40">
+            <CardContent className="flex items-center gap-4 p-5">
+              <div className="flex size-11 items-center justify-center rounded-lg bg-chart-2/15 text-chart-2">
+                <MessageSquare className="h-5 w-5" />
               </div>
-            </div>
-            <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
-          </CardContent>
-        </Card>
+              <div className="flex-1">
+                <div className="font-medium">Caixa de mensagens</div>
+                <div className="text-xs text-muted-foreground">
+                  3 conversas aguardando resposta
+                </div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/app/operacao/limpeza" className="block">
+          <Card className="group h-full transition hover:border-primary/40">
+            <CardContent className="flex items-center gap-4 p-5">
+              <div className="flex size-11 items-center justify-center rounded-lg bg-chart-3/15 text-chart-3">
+                <Home className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <div className="font-medium">Turnover pendente</div>
+                <div className="text-xs text-muted-foreground">
+                  2 limpezas a agendar nas próximas 24h
+                </div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
+            </CardContent>
+          </Card>
+        </Link>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -211,7 +212,8 @@ export function GanttTimeline() {
                       <Tooltip key={r.id}>
                         <TooltipTrigger
                           render={
-                            <div
+                            <Link
+                              href={`/app/reservas/${r.id}`}
                               className={cn(
                                 "absolute top-2 h-10 cursor-pointer rounded-md px-2 py-1 text-[10px] shadow-sm ring-1 ring-inset ring-white/20 transition-all hover:translate-y-[-1px] hover:shadow-md",
                                 isCurrent && "ring-2 ring-primary ring-offset-1",
@@ -229,7 +231,7 @@ export function GanttTimeline() {
                               <div className="truncate text-[9px] opacity-90">
                                 {r.nights}n · {brl(r.grossValue)}
                               </div>
-                            </div>
+                            </Link>
                           }
                         />
                         <TooltipContent side="top" className="max-w-[260px]">

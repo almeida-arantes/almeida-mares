@@ -136,25 +136,27 @@ export default function PortalPainelPage() {
         </div>
         <div className="grid gap-3 md:grid-cols-3">
           {[
-            { month: "Abril / 2026", value: "R$ 18.420", tag: "Novo", status: "pending" },
-            { month: "Março / 2026", value: "R$ 16.890", status: "paid" },
-            { month: "Fevereiro / 2026", value: "R$ 19.240", status: "paid" },
-          ].map((e, i) => (
-            <Card key={i} className="group cursor-pointer transition hover:border-primary/40">
-              <CardContent className="flex items-center gap-4 p-4">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <FileText className="h-5 w-5" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-1.5 text-sm font-medium">
-                    {e.month}
-                    {e.tag && <Badge>{e.tag}</Badge>}
+            { id: "abr-26", month: "Abril / 2026", value: "R$ 18.420", tag: "Novo" },
+            { id: "mar-26", month: "Março / 2026", value: "R$ 16.890" },
+            { id: "fev-26", month: "Fevereiro / 2026", value: "R$ 19.240" },
+          ].map((e) => (
+            <Link key={e.id} href={`/portal/extratos/${e.id}`} className="block">
+              <Card className="group h-full transition hover:border-primary/40">
+                <CardContent className="flex items-center gap-4 p-4">
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <FileText className="h-5 w-5" />
                   </div>
-                  <div className="font-mono text-xs text-muted-foreground">{e.value}</div>
-                </div>
-                <Download className="h-4 w-4 text-muted-foreground transition group-hover:text-foreground" />
-              </CardContent>
-            </Card>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-1.5 text-sm font-medium">
+                      {e.month}
+                      {e.tag ? <Badge>{e.tag}</Badge> : null}
+                    </div>
+                    <div className="font-mono text-xs text-muted-foreground">{e.value}</div>
+                  </div>
+                  <Download className="h-4 w-4 text-muted-foreground transition group-hover:text-foreground" />
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       </div>

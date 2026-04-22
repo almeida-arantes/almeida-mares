@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { PageHeader } from "@/components/app/page-header";
 
 const events = [
   { time: "14:32:08", user: "Ingrid A.", action: "approved_payout", target: "Ricardo Mendonça · abril/26", hash: "0x9fa…c21" },
@@ -24,20 +25,15 @@ const events = [
 export default function AuditoriaPage() {
   return (
     <div className="space-y-5 p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight">
-            Auditoria
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Registro imutável de todas as ações no sistema. Cadeia de hash assinada, pronta para validação externa.
-          </p>
-        </div>
+      <PageHeader
+        title="Auditoria"
+        description="Registro imutável de todas as ações no sistema. Cadeia de hash assinada, pronta para validação externa."
+      >
         <Badge variant="outline" className="gap-1">
           <ShieldCheck className="h-3 w-3 text-emerald-600" />
           Integridade validada
         </Badge>
-      </div>
+      </PageHeader>
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>

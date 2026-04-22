@@ -563,3 +563,19 @@ export const kpis = {
   directShare: 21,
   directShareDelta: 3.2,
 };
+
+export function getReservationById(id: string) {
+  return reservations.find((r) => r.id === id);
+}
+
+export function getOwnerById(id: string) {
+  return owners.find((o) => o.id === id);
+}
+
+export function getPropertyById(id: string) {
+  return properties.find((p) => p.id === id);
+}
+
+export function propertiesByOwner(ownerId: string) {
+  return properties.filter((p) => p.ownerId === ownerId);
+}

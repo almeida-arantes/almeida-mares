@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowDownRight, ArrowUpRight, CheckCircle2, Clock, Download, FileSpreadsheet, Receipt, Wallet } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,8 @@ import {
 import { owners, reservations } from "@/lib/mock-data";
 import { brl, brlCents, dateShort, initials } from "@/lib/formatters";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ModuleLinks } from "@/components/app/module-links";
+import { PageHeader } from "@/components/app/page-header";
 
 export default function FinanceiroPage() {
   const grossMonth = reservations.reduce((s, r) => s + r.grossValue, 0);
@@ -24,24 +27,24 @@ export default function FinanceiroPage() {
 
   return (
     <div className="space-y-5 p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight">Financeiro</h1>
-          <p className="text-sm text-muted-foreground">
-            Fechamento abril / 2026 · 5 extratos pendentes de aprovação
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <FileSpreadsheet className="h-4 w-4" />
-            Exportar contabilidade
-          </Button>
-          <Button size="sm" className="gap-1.5">
-            <CheckCircle2 className="h-4 w-4" />
-            Aprovar todos
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Financeiro"
+        description="Fechamento abril / 2026 · 5 extratos pendentes de aprovação"
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5"
+          render={<Link href="/app/integracoes/contabil" />}
+        >
+          <FileSpreadsheet className="h-4 w-4" />
+          Exportar contabilidade
+        </Button>
+        <Button size="sm" className="gap-1.5" render={<Link href="/app/financeiro/repasses" />}>
+          <CheckCircle2 className="h-4 w-4" />
+          Aprovar todos
+        </Button>
+      </PageHeader>
 
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
@@ -166,11 +169,20 @@ export default function FinanceiroPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1.5">
-                        <Button variant="ghost" size="sm" className="h-7 gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 gap-1"
+                          render={<Link href="/app/relatorios/gerar/extrato-mensal" />}
+                        >
                           <Download className="h-3 w-3" />
                           PDF
                         </Button>
-                        <Button size="sm" className="h-7">
+                        <Button
+                          size="sm"
+                          className="h-7"
+                          render={<Link href={`/app/proprietarios/${o.id}/repasses`} />}
+                        >
                           Aprovar
                         </Button>
                       </div>
@@ -266,6 +278,19 @@ export default function FinanceiroPage() {
           </CardContent>
         </Card>
       </div>
+
+      <ModuleLinks
+        layout="grid"
+        title="Módulos financeiros"
+        items={[
+          { href: "/app/financeiro/fluxo-caixa", label: "Fluxo de caixa", description: "Entradas e saídas projetadas" },
+          { href: "/app/financeiro/contas-pagar", label: "Contas a pagar" },
+          { href: "/app/financeiro/contas-receber", label: "Contas a receber" },
+          { href: "/app/financeiro/repasses", label: "Repasses" },
+          { href: "/app/financeiro/faturas", label: "Faturas OTA" },
+          { href: "/app/financeiro/conciliacao", label: "Conciliação bancária" },
+        ]}
+      />
     </div>
   );
 }

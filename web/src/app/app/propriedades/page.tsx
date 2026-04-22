@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Bath, Bed, MapPin, Plus, Star, Users } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { channels, owners, properties } from "@/lib/mock-data";
 import { brl, pct } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/app/page-header";
 
 const statusDot: Record<string, string> = {
   synced: "bg-emerald-500",
@@ -26,24 +28,22 @@ const typeLabel: Record<string, string> = {
 export default function PropriedadesPage() {
   return (
     <div className="space-y-5 p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight">Propriedades</h1>
-          <p className="text-sm text-muted-foreground">
-            {properties.length} imóveis sob gestão em {new Set(properties.map((p) => p.city)).size} cidades
-          </p>
-        </div>
-        <Button size="sm" className="gap-1.5">
+      <PageHeader
+        title="Propriedades"
+        description={`${properties.length} imóveis sob gestão em ${new Set(properties.map((p) => p.city)).size} cidades`}
+      >
+        <Button size="sm" className="gap-1.5" render={<Link href="/app/propriedades/nova" />}>
           <Plus className="h-4 w-4" />
           Nova propriedade
         </Button>
-      </div>
+      </PageHeader>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {properties.map((p) => {
           const owner = owners.find((o) => o.id === p.ownerId);
           return (
-            <Card key={p.id} className="group overflow-hidden transition hover:border-primary/40">
+            <Link key={p.id} href={`/app/propriedades/${p.id}`} className="block">
+            <Card className="group h-full overflow-hidden transition hover:border-primary/40">
               <div
                 className="relative h-44 bg-muted bg-cover bg-center"
                 style={{ backgroundImage: `url('${p.image}')` }}
@@ -131,6 +131,7 @@ export default function PropriedadesPage() {
                 </div>
               </CardContent>
             </Card>
+            </Link>
           );
         })}
       </div>

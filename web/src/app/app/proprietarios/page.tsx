@@ -8,6 +8,7 @@ import {
   Avatar,
   AvatarFallback,
 } from "@/components/ui/avatar";
+import { PageHeader } from "@/components/app/page-header";
 import { owners } from "@/lib/mock-data";
 import { brl, dateLong, initials } from "@/lib/formatters";
 
@@ -21,18 +22,15 @@ export default function ProprietariosPage() {
 
   return (
     <div className="space-y-5 p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight">Proprietários</h1>
-          <p className="text-sm text-muted-foreground">
-            {totals.count} clientes · {totals.properties} propriedades sob gestão
-          </p>
-        </div>
-        <Button size="sm" className="gap-1.5">
+      <PageHeader
+        title="Proprietários"
+        description={`${totals.count} clientes · ${totals.properties} propriedades sob gestão`}
+      >
+        <Button size="sm" className="gap-1.5" render={<Link href="/app/proprietarios/novo" />}>
           <Plus className="h-4 w-4" />
           Novo proprietário
         </Button>
-      </div>
+      </PageHeader>
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
@@ -70,9 +68,9 @@ export default function ProprietariosPage() {
                 </Avatar>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="truncate font-display text-lg font-semibold">
+                    <Link href={`/app/proprietarios/${o.id}`} className="truncate font-display text-lg font-semibold hover:underline">
                       {o.name}
-                    </h3>
+                    </Link>
                     <Badge variant="secondary" className="text-[10px]">
                       {o.commissionPct}%
                     </Badge>
@@ -92,7 +90,7 @@ export default function ProprietariosPage() {
                   </div>
                 </div>
                 <Link
-                  href="/app/proprietarios"
+                  href={`/app/proprietarios/${o.id}`}
                   className="rounded-md p-1.5 opacity-0 transition group-hover:opacity-100 hover:bg-muted"
                 >
                   <ArrowRight className="h-4 w-4" />

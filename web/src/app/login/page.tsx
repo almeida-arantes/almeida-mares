@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { ArrowRight, Mail } from "lucide-react";
+import { Suspense } from "react";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/brand/logo";
+import { LoginForm } from "@/components/auth/login-form";
+import { isAuthDevBypass } from "@/lib/dev-auth-bypass";
 
 export default function LoginPage() {
+  const devBypass = isAuthDevBypass();
+
   return (
     <div className="relative grid min-h-screen lg:grid-cols-2">
       <div className="relative hidden flex-col justify-between overflow-hidden bg-primary p-10 text-primary-foreground lg:flex">
@@ -36,42 +37,47 @@ export default function LoginPage() {
               Bem-vinda de volta
             </h1>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              Use seu e-mail para entrar. Enviaremos um link mágico de acesso.
+              Escolha o perfil, informe seu e-mail e o código de acesso fornecido pela
+              equipe.
             </p>
           </div>
 
           <Card>
-            <CardContent className="space-y-4 p-6">
-              <div className="space-y-2">
-                <Label htmlFor="email">E-mail</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="voce@almeidamares.com.br"
-                  autoComplete="email"
-                />
-              </div>
-              <Button className="w-full gap-2" render={<Link href="/app/inicio" />}>
-                <Mail className="h-4 w-4" />
-                Entrar com magic link
-              </Button>
-              <div className="relative text-center text-xs text-muted-foreground">
-                <span className="relative z-10 bg-card px-2">ou</span>
-                <div className="absolute inset-x-0 top-1/2 h-px bg-border" />
-              </div>
-              <Button
-                variant="outline"
-                className="w-full gap-2"
-                render={<Link href="/app/inicio" />}
-              >
-                Continuar como demonstração
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+            <CardContent className="p-6">
+              <Suspense fallback={null}>
+                <LoginForm />
+              </Suspense>
             </CardContent>
           </Card>
 
+          {devBypass ? (
+            <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-950 dark:text-amber-100">
+              <strong className="font-medium">Modo desenvolvedor:</strong> com{" "}
+              <code className="rounded bg-background/80 px-1 py-px font-mono">
+                NEXT_PUBLIC_AUTH_DEV_BYPASS=true
+              </code>{" "}
+              no <code className="font-mono">.env.local</code> você acessa o painel direto:{" "}
+              <Link href="/app/inicio" className="underline font-medium">
+                /app/inicio
+              </Link>
+              {" · "}
+              <Link href="/portal/painel" className="underline font-medium">
+                /portal/painel
+              </Link>
+              {" "}
+              (sem cadastro e sem formulário).
+            </div>
+          ) : null}
+
           <p className="text-center text-xs text-muted-foreground">
-            É proprietário? <Link href="/portal/painel" className="underline hover:text-foreground">Acesse o portal</Link>
+            <Link href="/recuperar-senha" className="underline hover:text-foreground">
+              Esqueci minha senha
+            </Link>
+            {" · "}
+            É proprietário?{" "}
+            <Link href="/login?context=portal" className="underline hover:text-foreground">
+              Acesse o portal
+            </Link>
           </p>
         </div>
       </div>

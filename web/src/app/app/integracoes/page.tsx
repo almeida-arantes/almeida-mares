@@ -1,9 +1,12 @@
+import Link from "next/link";
 import { AlertCircle, CheckCircle2, Clock, Link as LinkIcon, Settings2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { ModuleLinks } from "@/components/app/module-links";
+import { PageHeader } from "@/components/app/page-header";
 
 type Integration = {
   name: string;
@@ -12,6 +15,7 @@ type Integration = {
   mode: string;
   stats: { label: string; value: string }[];
   notes: string;
+  settingsHref: string;
 };
 
 const integrations: Integration[] = [
@@ -27,6 +31,7 @@ const integrations: Integration[] = [
     ],
     notes:
       "Polling /reservations a cada 20 segundos. Reconciliação de segurança via /reservationssummary a cada 15 minutos.",
+    settingsHref: "/app/integracoes/booking",
   },
   {
     name: "Airbnb",
@@ -40,6 +45,7 @@ const integrations: Integration[] = [
     ],
     notes:
       "Funcionando via iCal para bloqueio de datas. Aprovação do Partner Program desbloqueará tarifas dinâmicas, messaging e webhooks.",
+    settingsHref: "/app/integracoes/airbnb",
   },
   {
     name: "Vrbo / Expedia",
@@ -50,6 +56,7 @@ const integrations: Integration[] = [
       { label: "Propriedades", value: "2 elegíveis" },
     ],
     notes: "Integração planejada para Fase 2 (após MVP Booking + Airbnb).",
+    settingsHref: "/app/integracoes/vrbo",
   },
   {
     name: "WhatsApp Business",
@@ -63,6 +70,7 @@ const integrations: Integration[] = [
     ],
     notes:
       "Notificações transacionais de check-in, check-out, extrato mensal e pedido de review.",
+    settingsHref: "/app/integracoes/whatsapp",
   },
   {
     name: "Asaas (PIX)",
@@ -74,6 +82,7 @@ const integrations: Integration[] = [
       { label: "Taxas", value: "0,99% PIX" },
     ],
     notes: "Execução em lote dos repasses aprovados. Arquivo CNAB 240 como fallback.",
+    settingsHref: "/app/integracoes/pagamentos",
   },
   {
     name: "Pluggy (Open Finance)",
@@ -85,6 +94,7 @@ const integrations: Integration[] = [
       { label: "Classificadas", value: "94%" },
     ],
     notes: "Importação diária de extratos e reconciliação automática por descrição.",
+    settingsHref: "/app/financeiro/conciliacao",
   },
   {
     name: "PriceLabs",
@@ -95,6 +105,7 @@ const integrations: Integration[] = [
       { label: "Propriedades elegíveis", value: "11" },
     ],
     notes: "Sugestões diárias de tarifa aprovadas antes de ir para os canais.",
+    settingsHref: "/app/propriedades",
   },
 ];
 
@@ -108,14 +119,10 @@ const statusConfig = {
 export default function IntegracoesPage() {
   return (
     <div className="space-y-5 p-6">
-      <div>
-        <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Integrações
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Conexões vivas com os canais e serviços que movem a operação.
-        </p>
-      </div>
+      <PageHeader
+        title="Integrações"
+        description="Conexões vivas com os canais e serviços que movem a operação."
+      />
 
       <div className="grid gap-4 md:grid-cols-2">
         {integrations.map((i) => {
@@ -140,7 +147,12 @@ export default function IntegracoesPage() {
                       {i.tagline}
                     </div>
                   </div>
-                  <Button variant="outline" size="icon" className="size-8">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="size-8"
+                    render={<Link href={i.settingsHref as never} />}
+                  >
                     <Settings2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -172,6 +184,19 @@ export default function IntegracoesPage() {
           );
         })}
       </div>
+
+      <ModuleLinks
+        layout="grid"
+        title="Detalhe por integração"
+        items={[
+          { href: "/app/integracoes/booking", label: "Booking.com" },
+          { href: "/app/integracoes/airbnb", label: "Airbnb" },
+          { href: "/app/integracoes/vrbo", label: "Vrbo" },
+          { href: "/app/integracoes/whatsapp", label: "WhatsApp" },
+          { href: "/app/integracoes/pagamentos", label: "Pagamentos (Asaas)" },
+          { href: "/app/integracoes/contabil", label: "Exportação contábil" },
+        ]}
+      />
     </div>
   );
 }
