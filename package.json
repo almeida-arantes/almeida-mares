@@ -1,5 +1,5 @@
 {
   "name": "almeida-mares",
   "private": true,
-  "description": "A app Next.js está em /web. Na Vercel, defina Root Directory como \"web\" (recomendado) ou use o vercel.json na raiz."
+  "description": "Next.js em /web. Vercel: Settings → General → Root Directory = web → Save → Redeploy. O vercel.json na raiz ajuda se o Root Directory ficar na raiz do Git."
 }
